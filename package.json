@@ -1,0 +1,32 @@
+{
+  "name": "rr-tasking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Freyr-Wings/rr-tasking.git"
+  },
+  "author": "binlu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Freyr-Wings/rr-tasking/issues"
+  },
+  "homepage": "https://github.com/Freyr-Wings/rr-tasking#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "pg": "^8.2.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.0.1"
+  }
+}
