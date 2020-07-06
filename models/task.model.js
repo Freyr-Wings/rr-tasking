@@ -1,16 +1,16 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     const Task = sequelize.define("Task", {
         name: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         description: {
-            type: Sequelize.TEXT
+            type: DataTypes.TEXT
         },
         score: {
-            type: Sequelize.INTEGER
+            type: DataTypes.INTEGER
         },
         status: {
-            type: Sequelize.ENUM,
+            type: DataTypes.ENUM,
             values: ['active', 'inactive', 'declined', 'completed']
         }
     });

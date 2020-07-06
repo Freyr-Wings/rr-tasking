@@ -18,8 +18,20 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.user = require("./user.model.js")(sequelize, Sequelize);
-db.project = require("./project.model.js")(sequelize, Sequelize);
-db.task = require("./task.model.js")(sequelize, Sequelize);
+db.users = require("./user.model.js")(sequelize, Sequelize);
+db.projects = require("./project.model.js")(sequelize, Sequelize);
+db.tasks = require("./task.model.js")(sequelize, Sequelize);
+
+db.users.hasMany(db.projects, {as: "projects"})
+db.projects.belongsTo(db.users, {
+    foreignKey: "userId",
+    as: "assigner"
+})
+
+db.projects.hasMany(db.tasks, {as: "tasks"})
+db.tasks.belongsTo(db.projects, {
+    foreignKey: "projectId",
+    as: "project"
+})
 
 module.exports = db;

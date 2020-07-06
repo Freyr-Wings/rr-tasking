@@ -4,17 +4,19 @@ validateEmail = (email) => {
     return re.test(String(email).toLowerCase());
 }
 
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define("User", {
       email: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       name: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       surname: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       }
+    }, {
+        timestamps: false
     });
   
     return User;
