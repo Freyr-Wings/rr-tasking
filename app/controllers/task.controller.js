@@ -21,9 +21,35 @@ const Op = db.Sequelize.Op;
 const paging = require("./paging.js")
 
 exports.findAll = async (req, res) => {
-    var condition = null;
+    const { 
+        page, size, 
+        assigner_name, assigner_surname,
+        assignees_name, assignees_surname,
+    } = req.query;
+
+    var condition = assignees_name || assignees_surname ? {} : null;
+    if (assignees_name) {
+        condition["name"] = { [Op.like]: `%${assignees_name}%` };
+    }
+    if (assignees_surname) {
+        condition["surname"] = { [Op.like]: `%${assignees_surname}%` };
+    }
     try {
-        const data = await Task.findAll({ where: condition });
+        const data = await Task.findAll({ 
+            where: null,
+            include: [{
+                model: User,
+                as: "assignees",
+                where: condition,
+                through: {
+                    attributes: []
+                },
+                attributes: ["id", "name"]
+            },{
+                model: User,
+                as: "assigner"
+            }]
+        });
         res.send(data);
     } catch (err) {
         res.status(500).send({

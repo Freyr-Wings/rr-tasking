@@ -45,13 +45,13 @@ db.tasks.belongsTo(db.users, {
 })
 
 db.users.belongsToMany(db.tasks, { 
-    as: "assignment",
+    as: "assignments",
     through: "users_tasks",
     foreignKey: "user_id"
 })
 
 db.tasks.belongsToMany(db.users, {
-    as: "assignee", 
+    as: "assignees", 
     through: "users_tasks",
     foreignKey: "task_id"
 })

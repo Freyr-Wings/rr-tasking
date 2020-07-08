@@ -13,7 +13,7 @@ const Op = db.Sequelize.Op;
 const paging = require("./paging")
 
 // Retrieve all Users from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
     const { page, size, name, surname } = req.query;
 
     var condition = name || surname ? {} : null;
@@ -25,26 +25,25 @@ exports.findAll = (req, res) => {
     }
     const { limit, offset } = paging.getPagination(page, size);
 
-    User.findAndCountAll({ where: condition, limit, offset })
-        .then(data => {
-            const response = paging.getPagingData(data, page, limit);
-            res.send(response);
-        })
-        .catch(err => {
-            if (err instanceof db.Sequelize.BaseError) {
-                res.status(400).send({
-                    message: err.message
-                });
-            } else {
-                res.status(500).send({
-                    message: err.message || "Some error occurred while retrieving the User."
-                });
-            }
-        });
+    try {
+        const data = await User.findAndCountAll({ where: condition, limit, offset });
+        const response = paging.getPagingData(data, page, limit);
+        res.send(response);
+    } catch (err) {
+        if (err instanceof db.Sequelize.BaseError) {
+            res.status(400).send({
+                message: err.message
+            });
+        } else {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving the User."
+            });
+        }
+    }
 };
 
 // Create and Save a new User
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
     // Create a user
     const user = {
         email: req.body.email,
@@ -53,23 +52,22 @@ exports.create = (req, res) => {
     };
 
     // Save user in the database
-    User.create(user)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            if (err instanceof db.Sequelize.ValidationError) {
-                res.status(422).send({
-                    message: err.message
-                });
-            } else if (err instanceof db.Sequelize.BaseError) {
-                res.status(400).send({
-                    message: err.message
-                });
-            } else {
-                res.status(500).send({
-                    message: err.message || "Some error occurred while creating the User."
-                });
-            }
-        });
+    try {
+        const data = await User.create(user);
+        res.send(data);
+    } catch (err) {
+        if (err instanceof db.Sequelize.ValidationError) {
+            res.status(422).send({
+                message: err.message
+            });
+        } else if (err instanceof db.Sequelize.BaseError) {
+            res.status(400).send({
+                message: err.message
+            });
+        } else {
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the User."
+            });
+        }
+    }
 };
