@@ -45,7 +45,7 @@ describe('Basic function', function () {
                     name: "task" + i.toString().padStart(3, "0"),
                     description: "do sth No." + i.toString().padStart(3, "0") + "...",
                     score: Math.trunc(i / 4),
-                    status: "active",
+                    status: i % 2 == 0 ? "active" : "inactive",
                     user_id: Math.trunc((i-1) / (numTask/numUser)) + 1,
                 }));
             }
@@ -82,9 +82,68 @@ describe('Basic function', function () {
         });
 
         it('GET /api/tasks?name', async function () {
-            const res = await chai.request(host).get("/api/tasks?assignees_name=tom003");
+            const res = await chai.request(host)
+            .get("/api/tasks")
+            .set('Content-Type', 'application/json')
+            .send({
+                name: "5",
+            });
+            // console.log(res.body);
             res.should.have.status(200);
-            res.body.should.have.length(3);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(2);
+        });
+
+        it('GET /api/tasks?assignees_name', async function () {
+            const res = await chai.request(host)
+            .get("/api/tasks?page=0&size=5")
+            .set('Content-Type', 'application/json')
+            .send({
+                assignees_name: "tom004",
+            });
+            // console.log(res.body);
+            res.should.have.status(200);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(4);
+        });
+
+        it('GET /api/tasks?assigner_name', async function () {
+            const res = await chai.request(host)
+            .get("/api/tasks?page=0&size=5")
+            .set('Content-Type', 'application/json')
+            .send({
+                assigner_name: "tom006",
+            });
+            // console.log(res.body);
+            res.should.have.status(200);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(2);
+        });
+
+        it('GET /api/tasks?assignees_ids', async function () {
+            const res = await chai.request(host)
+            .get("/api/tasks?page=0&size=15")
+            .set('Content-Type', 'application/json')
+            .send({
+                assignees_ids: [2,4,6,8],
+            });
+            // console.log(res.body);
+            res.should.have.status(200);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(8);
+        });
+
+        it('GET /api/tasks?status', async function () {
+            const res = await chai.request(host)
+            .get("/api/tasks?page=0&size=15")
+            .set('Content-Type', 'application/json')
+            .send({
+                status_array: ['active'],
+            });
+            // console.log(res.body);
+            res.should.have.status(200);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(10);
         });
     });
 });

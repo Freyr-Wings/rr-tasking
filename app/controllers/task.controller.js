@@ -21,40 +21,82 @@ const Op = db.Sequelize.Op;
 const paging = require("./paging.js")
 
 exports.findAll = async (req, res) => {
-    const { 
-        page, size, 
-        assigner_name, assigner_surname,
-        assignees_name, assignees_surname,
-    } = req.query;
+    const { name, description, status_array, score_least } = req.body;
+    let task_condition = name || description || status_array || score_least? {} : null;
+    if (name) {
+        task_condition["name"] = { [Op.like]: `%${name}%` };
+    }
+    if (description) {
+        task_condition["description"] = { [Op.like]: `%${description}%` };
+    }
+    if (status_array) {
+        task_condition["status"] = { [Op.in]: status_array };
+    }
+    if (score_least) {
+        task_condition["score"] = { [Op.gte]: score_least };
+    }
 
-    var condition = assignees_name || assignees_surname ? {} : null;
+    const { assignees_name, assignees_surname, assignees_ids } = req.body;
+    let assignees_condition = assignees_name || assignees_surname || assignees_ids? {} : null;
     if (assignees_name) {
-        condition["name"] = { [Op.like]: `%${assignees_name}%` };
+        assignees_condition["name"] = { [Op.like]: `%${assignees_name}%` };
     }
     if (assignees_surname) {
-        condition["surname"] = { [Op.like]: `%${assignees_surname}%` };
+        assignees_condition["surname"] = { [Op.like]: `%${assignees_surname}%` };
     }
+    if (assignees_ids) {
+        assignees_condition["id"] = { [Op.in]: assignees_ids };
+    }
+
+    const { assigner_name, assigner_surname, assigner_ids } = req.body;
+    let assigner_condition = assigner_name || assigner_surname ? {} : null;
+    if (assigner_name) {
+        assigner_condition["name"] = { [Op.like]: `%${assigner_name}%` };
+    }
+    if (assigner_surname) {
+        assigner_condition["surname"] = { [Op.like]: `%${assigner_surname}%` };
+    }
+
+    const { page, size } = req.query;
+    const { limit, offset } = paging.getPagination(page, size);
+
     try {
-        const data = await Task.findAll({ 
-            where: null,
+        const data = await Task.findAndCountAll({ 
+            where: task_condition,
             include: [{
                 model: User,
                 as: "assignees",
-                where: condition,
+                where: assignees_condition,
                 through: {
                     attributes: []
                 },
-                attributes: ["id", "name"]
+                attributes: ["id", "name"],
             },{
                 model: User,
-                as: "assigner"
-            }]
+                as: "assigner",
+                where: assigner_condition,
+            }],
+            order: [
+                ['id', 'ASC'],
+                ['name', 'ASC'],
+            ],
+            limit,
+            offset,
+            distinct: true
         });
-        res.send(data);
+        const response = paging.getPagingData(data, page, limit);
+        console.log(data);
+        res.send(response);
     } catch (err) {
-        res.status(500).send({
-            message: err.message || "Some error occurred while adding assignee."
-        });
+        if (err instanceof db.Sequelize.BaseError) {
+            res.status(400).send({
+                message: err.message
+            });
+        } else {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving the User."
+            });
+        }
     }
 };
 

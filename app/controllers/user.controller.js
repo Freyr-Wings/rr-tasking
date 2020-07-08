@@ -27,6 +27,7 @@ exports.findAll = async (req, res) => {
 
     try {
         const data = await User.findAndCountAll({ where: condition, limit, offset });
+        // console.log(data);
         const response = paging.getPagingData(data, page, limit);
         res.send(response);
     } catch (err) {
