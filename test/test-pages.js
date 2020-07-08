@@ -11,13 +11,13 @@ describe('Basic function', function () {
     describe('User', function () {
         it('POST /api/users', async function () {
             let promises = [];
-            for (let i = 1; i <= numUser; i++) {
+            for (let i = 0; i < numUser; i++) {
                 promises.push(chai.request(host)
                 .post('/api/users')
                 .set('Content-Type', 'application/json')
                 .send({
-                    email: "tom" + i.toString().padStart(3, "0") + "@cats.com",
-                    name: "tom" + i.toString().padStart(3, "0"),
+                    email: "tom" + (i+1).toString().padStart(3, "0") + "@cats.com",
+                    name: "tom" + (i+1).toString().padStart(3, "0"),
                     surname: "cat"
                 }));
             }
@@ -103,6 +103,7 @@ describe('Basic function', function () {
             });
             // console.log(res.body);
             res.should.have.status(200);
+            console.log(res.body);
             res.body.should.have.property('items');
             res.body.items.should.have.length(4);
         });

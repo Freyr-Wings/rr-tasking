@@ -85,7 +85,7 @@ exports.findAll = async (req, res) => {
             distinct: true
         });
         const response = paging.getPagingData(data, page, limit);
-        console.log(data);
+        // console.log(data);
         res.send(response);
     } catch (err) {
         if (err instanceof db.Sequelize.BaseError) {
