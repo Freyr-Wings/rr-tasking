@@ -28,13 +28,22 @@ db.projects.belongsTo(db.users, {
     foreignKey: "user_id",
 })
 
-// db.projects.hasMany(db.tasks, { as: "tasks" })
+db.projects.hasMany(db.tasks, { 
+    as: "tasks",
+    foreignKey: "project_id"
+})
 db.tasks.belongsTo(db.projects, {
     as: "project",
     foreignKey: "project_id"
 })
 
-// db.users.hasMany(db.tasks, { as: "tasks" })
+db.users.hasMany(db.tasks, { 
+    as: "tasks",
+    foreignKey: {
+        name: "user_id",
+        allowNull: false,
+    },
+})
 db.tasks.belongsTo(db.users, {
     as: "assigner",
     foreignKey: {

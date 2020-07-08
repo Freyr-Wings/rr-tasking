@@ -12,6 +12,7 @@ describe('Basic function', function () {
         it('POST /api/users', async function () {
             let promises = [];
             for (let i = 0; i < numUser; i++) {
+                // since the call is async, this id may not match the exact id in database
                 const id = i + 1;
                 promises.push(chai.request(host)
                 .post('/api/users')
@@ -52,7 +53,6 @@ describe('Basic function', function () {
             }
             const results = await Promise.all(promises);
             for (let i = 0; i < numTask; i++) {
-                // console.log(results[i].body);
                 results[i].should.have.status(200);
             }
         });
@@ -86,11 +86,9 @@ describe('Basic function', function () {
         it('GET /api/tasks?name', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 name: "5",
             });
-            // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(2);
@@ -99,29 +97,25 @@ describe('Basic function', function () {
         it('GET /api/tasks?assignees_name', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 page: 0,
                 size: 15,
-                assignees_name: "tom004",
+                assignees_name: "tom",
             });
-            // console.log(res.body);
             res.should.have.status(200);
-            console.log(res.body);
+            // console.log(res.body);
             res.body.should.have.property('items');
-            res.body.items.should.have.length(4);
+            res.body.items.should.have.length(10);
         });
 
         it('GET /api/tasks?assigner_name', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 page: 0,
                 size: 15,
                 assigner_name: "tom006",
             });
-            // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(2);
@@ -130,13 +124,11 @@ describe('Basic function', function () {
         it('GET /api/tasks?assignees_ids', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 page: 0,
                 size: 15,
                 assignees_ids: [2,4,6,8],
             });
-            // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(8);
@@ -145,13 +137,11 @@ describe('Basic function', function () {
         it('GET /api/tasks?status', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 page: 0,
                 size: 15,
                 status: ['active'],
             });
-            // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(10);
@@ -160,13 +150,11 @@ describe('Basic function', function () {
         it('GET /api/tasks?score', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            // .set('Content-Type', 'application/json')
             .query({
                 page: 0,
                 size: 15,
                 score_least: 4,
             });
-            // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(5);
