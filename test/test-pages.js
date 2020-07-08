@@ -12,12 +12,13 @@ describe('Basic function', function () {
         it('POST /api/users', async function () {
             let promises = [];
             for (let i = 0; i < numUser; i++) {
+                const id = i + 1;
                 promises.push(chai.request(host)
                 .post('/api/users')
                 .set('Content-Type', 'application/json')
                 .send({
-                    email: "tom" + (i+1).toString().padStart(3, "0") + "@cats.com",
-                    name: "tom" + (i+1).toString().padStart(3, "0"),
+                    email: "tom" + id.toString().padStart(3, "0") + "@cats.com",
+                    name: "tom" + id.toString().padStart(3, "0"),
                     surname: "cat"
                 }));
             }
@@ -60,12 +61,13 @@ describe('Basic function', function () {
             let promises = [];
             for (let i = 1; i <= numUser; i++) {
                 for (let j = 1; j <= i; j++) {
+                    const user_id = i, task_id = j;
                     promises.push(chai.request(host)
                     .put('/api/tasks')
                     .set('Content-Type', 'application/json')
                     .send({
-                        user_id: i,
-                        task_id: j,
+                        user_id,
+                        task_id,
                     }));
                 }
                 
@@ -84,8 +86,8 @@ describe('Basic function', function () {
         it('GET /api/tasks?name', async function () {
             const res = await chai.request(host)
             .get("/api/tasks")
-            .set('Content-Type', 'application/json')
-            .send({
+            // .set('Content-Type', 'application/json')
+            .query({
                 name: "5",
             });
             // console.log(res.body);
@@ -96,9 +98,11 @@ describe('Basic function', function () {
 
         it('GET /api/tasks?assignees_name', async function () {
             const res = await chai.request(host)
-            .get("/api/tasks?page=0&size=5")
-            .set('Content-Type', 'application/json')
-            .send({
+            .get("/api/tasks")
+            // .set('Content-Type', 'application/json')
+            .query({
+                page: 0,
+                size: 15,
                 assignees_name: "tom004",
             });
             // console.log(res.body);
@@ -110,9 +114,11 @@ describe('Basic function', function () {
 
         it('GET /api/tasks?assigner_name', async function () {
             const res = await chai.request(host)
-            .get("/api/tasks?page=0&size=5")
-            .set('Content-Type', 'application/json')
-            .send({
+            .get("/api/tasks")
+            // .set('Content-Type', 'application/json')
+            .query({
+                page: 0,
+                size: 15,
                 assigner_name: "tom006",
             });
             // console.log(res.body);
@@ -123,9 +129,11 @@ describe('Basic function', function () {
 
         it('GET /api/tasks?assignees_ids', async function () {
             const res = await chai.request(host)
-            .get("/api/tasks?page=0&size=15")
-            .set('Content-Type', 'application/json')
-            .send({
+            .get("/api/tasks")
+            // .set('Content-Type', 'application/json')
+            .query({
+                page: 0,
+                size: 15,
                 assignees_ids: [2,4,6,8],
             });
             // console.log(res.body);
@@ -136,15 +144,32 @@ describe('Basic function', function () {
 
         it('GET /api/tasks?status', async function () {
             const res = await chai.request(host)
-            .get("/api/tasks?page=0&size=15")
-            .set('Content-Type', 'application/json')
-            .send({
-                status_array: ['active'],
+            .get("/api/tasks")
+            // .set('Content-Type', 'application/json')
+            .query({
+                page: 0,
+                size: 15,
+                status: ['active'],
             });
             // console.log(res.body);
             res.should.have.status(200);
             res.body.should.have.property('items');
             res.body.items.should.have.length(10);
+        });
+
+        it('GET /api/tasks?score', async function () {
+            const res = await chai.request(host)
+            .get("/api/tasks")
+            // .set('Content-Type', 'application/json')
+            .query({
+                page: 0,
+                size: 15,
+                score_least: 4,
+            });
+            // console.log(res.body);
+            res.should.have.status(200);
+            res.body.should.have.property('items');
+            res.body.items.should.have.length(5);
         });
     });
 });

@@ -21,22 +21,23 @@ const Op = db.Sequelize.Op;
 const paging = require("./paging.js")
 
 exports.findAll = async (req, res) => {
-    const { name, description, status_array, score_least } = req.body;
-    let task_condition = name || description || status_array || score_least? {} : null;
+    const { name, description, status, score_least } = req.query;
+    console.log(req.query);
+    let task_condition = name || description || status || score_least? {} : null;
     if (name) {
         task_condition["name"] = { [Op.like]: `%${name}%` };
     }
     if (description) {
         task_condition["description"] = { [Op.like]: `%${description}%` };
     }
-    if (status_array) {
-        task_condition["status"] = { [Op.in]: status_array };
+    if (status) {
+        task_condition["status"] = { [Op.in]: status instanceof Array ? status : [status] };
     }
     if (score_least) {
         task_condition["score"] = { [Op.gte]: score_least };
     }
 
-    const { assignees_name, assignees_surname, assignees_ids } = req.body;
+    const { assignees_name, assignees_surname, assignees_ids } = req.query;
     let assignees_condition = assignees_name || assignees_surname || assignees_ids? {} : null;
     if (assignees_name) {
         assignees_condition["name"] = { [Op.like]: `%${assignees_name}%` };
@@ -45,10 +46,10 @@ exports.findAll = async (req, res) => {
         assignees_condition["surname"] = { [Op.like]: `%${assignees_surname}%` };
     }
     if (assignees_ids) {
-        assignees_condition["id"] = { [Op.in]: assignees_ids };
+        assignees_condition["id"] = { [Op.in]: assignees_ids instanceof Array ? assignees_ids : [assignees_ids] };
     }
 
-    const { assigner_name, assigner_surname, assigner_ids } = req.body;
+    const { assigner_name, assigner_surname, assigner_ids } = req.query;
     let assigner_condition = assigner_name || assigner_surname ? {} : null;
     if (assigner_name) {
         assigner_condition["name"] = { [Op.like]: `%${assigner_name}%` };
