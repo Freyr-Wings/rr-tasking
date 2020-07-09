@@ -12,8 +12,9 @@ const User = db.users;
 const Op = db.Sequelize.Op;
 const paging = require("./paging")
 
-// Retrieve all Users from the database.
+// Retrieve users from the database
 exports.findAll = async (req, res) => {
+    // Collect conditions for user
     const { page, size, name, surname } = req.query;
 
     var condition = name || surname ? {} : null;
@@ -25,6 +26,7 @@ exports.findAll = async (req, res) => {
     }
     const { limit, offset } = paging.getPagination(page, size);
 
+    // Retrieve users from database
     try {
         const data = await User.findAndCountAll({ where: condition, limit, offset });
         // console.log(data);
@@ -43,7 +45,7 @@ exports.findAll = async (req, res) => {
     }
 };
 
-// Create and Save a new User
+// Create and save a new user
 exports.create = async (req, res) => {
     // Create a user
     const user = {

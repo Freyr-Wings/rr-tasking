@@ -22,10 +22,31 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.projects = require("./project.model.js")(sequelize, Sequelize);
 db.tasks = require("./task.model.js")(sequelize, Sequelize);
 
-// db.users.hasMany(db.projects, { as: "projects" })
+db.users.hasMany(db.projects, { 
+    as: "projects",
+    foreignKey: {
+        name: "user_id",
+        allowNull: false,
+    },
+})
 db.projects.belongsTo(db.users, {
     as: "assigner",
-    foreignKey: "user_id",
+    foreignKey: {
+        name: "user_id",
+        allowNull: false,
+    },
+})
+
+db.users.belongsToMany(db.projects, { 
+    as: "assignments_proj",
+    through: "users_projects",
+    foreignKey: "user_id"
+})
+
+db.projects.belongsToMany(db.users, {
+    as: "assignees", 
+    through: "users_projects",
+    foreignKey: "project_id"
 })
 
 db.projects.hasMany(db.tasks, { 

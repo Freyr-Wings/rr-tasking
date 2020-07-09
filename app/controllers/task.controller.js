@@ -20,7 +20,9 @@ const User = db.users;
 const Op = db.Sequelize.Op;
 const paging = require("./paging.js")
 
+// Retrieve tasks with or withouout conditions
 exports.findAll = async (req, res) => {
+    // Collect conditions for task
     const { name, description, status, score_least } = req.query;
     console.log(req.query);
     let task_condition = name || description || status || score_least? {} : null;
@@ -37,6 +39,7 @@ exports.findAll = async (req, res) => {
         task_condition["score"] = { [Op.gte]: score_least };
     }
 
+    // Collect conditions for assignees
     const { assignees_name, assignees_surname, assignees_ids } = req.query;
     let assignees_condition = assignees_name || assignees_surname || assignees_ids? {} : null;
     if (assignees_name) {
@@ -49,6 +52,7 @@ exports.findAll = async (req, res) => {
         assignees_condition["id"] = { [Op.in]: assignees_ids instanceof Array ? assignees_ids : [assignees_ids] };
     }
 
+    // Collect conditions for assigner
     const { assigner_name, assigner_surname, assigner_ids } = req.query;
     let assigner_condition = assigner_name || assigner_surname ? {} : null;
     if (assigner_name) {
@@ -58,9 +62,11 @@ exports.findAll = async (req, res) => {
         assigner_condition["surname"] = { [Op.like]: `%${assigner_surname}%` };
     }
 
+    // Collect conditions for paging
     const { page, size } = req.query;
     const { limit, offset } = paging.getPagination(page, size);
 
+    // Retrieve tasks from database
     try {
         const data = await Task.findAndCountAll({ 
             where: task_condition,
